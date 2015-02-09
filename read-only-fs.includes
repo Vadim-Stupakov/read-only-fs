@@ -2531,5 +2531,5 @@
 /usr/src/linux-headers-link/samples/hw_breakpoint
 /usr/src/linux-headers-link/virt
 /usr/src/linux-headers-link/virt/kvm
-aflt
+roflt
 redirfs
