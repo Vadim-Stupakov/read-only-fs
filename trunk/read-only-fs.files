@@ -1,11 +1,3 @@
-avflt/avflt.h
-avflt/avflt_check.c
-avflt/avflt_data.c
-avflt/avflt_dev.c
-avflt/avflt_mod.c
-avflt/avflt_proc.c
-avflt/avflt_rfs.c
-avflt/avflt_sysfs.c
 redirfs/redirfs.h
 redirfs/rfs.c
 redirfs/rfs.h
@@ -22,3 +14,13 @@ redirfs/rfs_path.c
 redirfs/rfs_root.c
 redirfs/rfs_sysfs.c
 Makefile
+ro_dev.c
+ro_flt/roflt_dev.c
+ro_flt/roflt_util.h
+roflt/roflt_dev.c
+roflt/roflt_util.h
+roflt/Makefile
+Makefile
+redirfs/Makefile
+roflt/roflt_rfs.c
+roflt/roflt_rfs.h
