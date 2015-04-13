@@ -2562,4 +2562,9 @@ INCLUDEPATH = \
     /usr/src/linux-headers-link/virt \
     /usr/src/linux-headers-link/virt/kvm
 
+OTHER_FILES += \
+    Makefile \
+    roflt/Makefile \
+    redirfs/Makefile
+
 
