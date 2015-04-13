@@ -25,7 +25,9 @@ HEADERS += \
     redirfs/redirfs.h \
     redirfs/rfs.h \
     roflt/roflt_rfs.h \
-    roflt/roflt_util.h \
+    roflt/roflt_util.h
+
+INCLUDEPATH = \
     /usr/src/linux-headers-link \
     /usr/src/linux-headers-link/ipc \
     /usr/src/linux-headers-link/lib \
