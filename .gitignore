@@ -16,3 +16,4 @@
 /redirfs/.rfs_sysfs.o.cmd
 /redirfs/redirfs.ko
 /redirfs/redirfs.mod.c
+/read-only-fs.pro.user
