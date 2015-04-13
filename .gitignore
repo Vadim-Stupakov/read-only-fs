@@ -1,0 +1,16 @@
+/redirfs/.redirfs.ko.cmd
+/redirfs/.redirfs.mod.o.cmd
+/redirfs/.redirfs.o.cmd
+/redirfs/.rfs.o.cmd
+/redirfs/.rfs_chain.o.cmd
+/redirfs/.rfs_data.o.cmd
+/redirfs/.rfs_dcache.o.cmd
+/redirfs/.rfs_dentry.o.cmd
+/redirfs/.rfs_file.o.cmd
+/redirfs/.rfs_flt.o.cmd
+/redirfs/.rfs_info.o.cmd
+/redirfs/.rfs_inode.o.cmd
+/redirfs/.rfs_ops.o.cmd
+/redirfs/.rfs_path.o.cmd
+/redirfs/.rfs_root.o.cmd
+/redirfs/.rfs_sysfs.o.cmd
