@@ -14,3 +14,5 @@
 /redirfs/.rfs_path.o.cmd
 /redirfs/.rfs_root.o.cmd
 /redirfs/.rfs_sysfs.o.cmd
+/redirfs/redirfs.ko
+/redirfs/redirfs.mod.c
