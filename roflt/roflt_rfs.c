@@ -5,11 +5,22 @@ redirfs_filter roflt;
 
 enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *rargs){
     FILTER_LOG_DEBUG("%s", "");
+//    rargs->args.f_open.file = NULL;
+//    rargs->args.f_open.inode = NULL;
+//    rargs->rv.rv_int = -1;
+    return REDIRFS_STOP;
+}
+
+enum redirfs_rv roflt_post_callback(redirfs_context cont, struct redirfs_args *rargs){
+    FILTER_LOG_DEBUG("%s", "");
+//    rargs->args.f_open.file = NULL;
+//    rargs->args.f_open.inode = NULL;
+//    rargs->rv.rv_int = -1;
     return REDIRFS_STOP;
 }
 
 static struct redirfs_op_info roflt_op_info[] = {
-    {REDIRFS_DIR_IOP_CREATE, roflt_pre_callback, NULL},
+    {REDIRFS_REG_FOP_OPEN, roflt_pre_callback, roflt_post_callback},
     {REDIRFS_OP_END, NULL, NULL}
 };
 
