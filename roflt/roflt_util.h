@@ -9,6 +9,13 @@
 
 #ifdef DEBUG
 
+#define PRINT_DUMP_STACK\
+    do{\
+        printk("\n\nDump stack begin:\n\n");\
+        dump_stack();\
+        printk("\n\nDump stack end:\n\n");\
+    }while(0);\
+
 #if DEBUG > 0
 #define FILTER_LOG_INFO(format, args...)\
     printk(KERN_INFO "File:(%s), Line:(%u), Function:(%s)\n\tMessage: "format"\n", GET_FILE_LINE_FUNC_ARG, args)

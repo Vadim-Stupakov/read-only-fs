@@ -1,41 +1,42 @@
 #include "roflt_rfs.h"
-#include "roflt_util.h"
 
 redirfs_filter roflt;
 
 enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *rargs){
     FILTER_LOG_DEBUG("%s", "");
-//    rargs->args.f_open.file = NULL;
-//    rargs->args.f_open.inode = NULL;
-//    rargs->rv.rv_int = -1;
+    PRINT_DUMP_STACK;
+    rargs->rv.rv_int = EROFS;
     return REDIRFS_STOP;
 }
 
 enum redirfs_rv roflt_post_callback(redirfs_context cont, struct redirfs_args *rargs){
     FILTER_LOG_DEBUG("%s", "");
-//    rargs->args.f_open.file = NULL;
-//    rargs->args.f_open.inode = NULL;
-//    rargs->rv.rv_int = -1;
+    PRINT_DUMP_STACK;
+    rargs->rv.rv_int = EROFS;
     return REDIRFS_STOP;
 }
 
-static struct redirfs_op_info roflt_op_info[] = {
-    {REDIRFS_REG_FOP_OPEN, roflt_pre_callback, roflt_post_callback},
-    {REDIRFS_OP_END, NULL, NULL}
+static struct redirfs_op_info roflt_op_info[] =
+{
+    {REDIRFS_REG_FOP_OPEN,      roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_MKDIR,     roflt_pre_callback, NULL},
+    {REDIRFS_OP_END,            NULL,               NULL}
 };
 
 static struct redirfs_filter_operations roflt_ops =
 {
-    .activate = roflt_activate,
-    .add_path = roflt_add_path
+    .activate =     roflt_activate,
+    .add_path =     roflt_add_path,
+    .unregister =   roflt_unregister
 };
 
-static struct redirfs_filter_info roflt_info = {
-    .owner = THIS_MODULE,
-    .name = "roflt",
+static struct redirfs_filter_info roflt_info =
+{
+    .owner =    THIS_MODULE,
+    .name =     "roflt",
     .priority = 60321,
-    .active = 1,
-    .ops = &roflt_ops
+    .active =   1,
+    .ops =      &roflt_ops
 };
 
 //Registration, activation and operation settings
@@ -70,17 +71,21 @@ error:
     return rv;
 }
 
-void roflt_cleanup_rfs(void){
-    if(!redirfs_unregister_filter(roflt)){
-        FILTER_LOG_CRIT("%s", "unsuccessful!");
+void roflt_unregister(void){
+    int rv = redirfs_unregister_filter(roflt);
+    if(rv){
+        FILTER_LOG_CRIT("redirfs_unregister_filter() Error! Error code = %d", rv);
     }
-    FILTER_LOG_DEBUG("%s", "successful!");
+    else{
+        redirfs_delete_filter(roflt);
+        FILTER_LOG_DEBUG("%s", "successful!");
+    }
 }
 
 int roflt_add_path(struct redirfs_path_info *info)
 {
-    redirfs_path path;
-    redirfs_root root;
+    redirfs_path path = {0};
+    redirfs_root root = {0};
 
     path = redirfs_add_path(roflt, info);
     if (IS_ERR(path)){
@@ -104,6 +109,14 @@ int roflt_add_path(struct redirfs_path_info *info)
 
 int roflt_activate(void)
 {
-    return redirfs_activate_filter(roflt);
-    FILTER_LOG_DEBUG("%s", "successful!");
+    int rv = redirfs_activate_filter(roflt);
+
+    if(!rv){
+        FILTER_LOG_DEBUG("%s", "successful!");
+    }
+    else{
+        FILTER_LOG_DEBUG("%s", "successful!");
+    }
+
+    return rv;
 }

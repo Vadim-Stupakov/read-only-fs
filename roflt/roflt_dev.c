@@ -129,6 +129,6 @@ int init_module(void){ /* Constructor */
 void cleanup_module(void){ /* Destructor */
     roflt_clean_char_dev();
     FILTER_LOG_INFO(KERN_INFO "%s: unregistered", roflt_dev_name);
-    roflt_cleanup_rfs();
+    roflt_unregister();
 }
 
