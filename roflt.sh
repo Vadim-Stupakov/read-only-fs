@@ -8,10 +8,13 @@ SYSFS_PATH="/sys/fs/${REDIRFS}/filters/${FILTER}"
 
 load(){
     insmod "${REDIRFS}/${REDIRFS}.ko"
+    sleep 5
     insmod "${FILTER}/${FILTER}.ko"
+    echo "1" > "${SYSFS_PATH}/active"
 }
 
 addPaths(){
+    sleep 5
     local path="${1}"
     echo "a:i:${path}" > "${SYSFS_PATH}/paths"
 }
@@ -42,6 +45,6 @@ if [ "${ARG}" == "add-path" ];then
     if [ "${path}" != "" ]; then
         addPaths "${path}"
     else
-        echo "Please, enter path as second parameter"
+        echo "Please, enter path as a second parameter"
     fi
 fi
