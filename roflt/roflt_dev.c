@@ -25,7 +25,7 @@ int roflt_open(struct inode *i, struct file *f);
 int roflt_close(struct inode *i, struct file *f);
 ssize_t roflt_read(struct file *f, char __user *buf, size_t len, loff_t *off);
 
-
+//redirfs_filter roflt_flt;
 static struct cdev char_dev;
 static dev_t first = 0;
 static struct class* cl = NULL;
@@ -127,8 +127,9 @@ int init_module(void){ /* Constructor */
 }
 
 void cleanup_module(void){ /* Destructor */
-    roflt_clean_char_dev();
+    redirfs_delete_filter(roflt_flt);
     FILTER_LOG_INFO(KERN_INFO "%s: unregistered", roflt_dev_name);
     roflt_unregister();
+    roflt_clean_char_dev();
 }
 
