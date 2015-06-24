@@ -4,7 +4,7 @@
  * Midified by KINTA-JAPAN <sanu@ruby.plala.or.jo>
  *
  * Copyright 2008 - 2010 Frantisek Hrbata
- * Copyright 2013 - 2014 KINTA-JAPAN
+ * Copyright 2013 - 2015 KINTA-JAPAN
  * All rights reserved.
  *
  * This file is part of RedirFS.
@@ -90,7 +90,12 @@ static struct rfs_file *rfs_file_add(struct file *file)
 	if (IS_ERR(rfile))
 		return rfile;
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0))
 	rfile->rdentry = rfs_dentry_find(file->f_dentry);
+#else
+	rfile->rdentry = rfs_dentry_find(file->f_path.dentry);
+#endif
+
 	rfs_dentry_add_rfile(rfile->rdentry, rfile);
 	fops_put(file->f_op);
 	file->f_op = &rfile->op_new;
@@ -138,7 +143,12 @@ int rfs_open(struct inode *inode, struct file *file)
 	fops_put(file->f_op);
 	file->f_op = fops_get(rinode->fop_old);
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0))
 	rdentry = rfs_dentry_find(file->f_dentry);
+#else
+	rdentry = rfs_dentry_find(file->f_path.dentry);
+#endif
+
 	if (!rdentry) {
 		rfs_inode_put(rinode);
 		if (file->f_op && file->f_op->open)
@@ -265,8 +275,13 @@ static int rfs_iterate(struct file *file, struct dir_context *dir_context)
 	rargs.args.f_readdir.file = file;
 	rargs.args.f_readdir.dirent = dirent;
 	rargs.args.f_readdir.filldir = filldir;
-#else
+#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0))
 	if (S_ISDIR(file->f_dentry->d_inode->i_mode))
+		rargs.type.id = REDIRFS_DIR_FOP_ITERATE;
+	rargs.args.f_iterate.file = file;
+	rargs.args.f_iterate.dir_context = dir_context;
+#else
+	if (S_ISDIR(file->f_path.dentry->d_inode->i_mode))
 		rargs.type.id = REDIRFS_DIR_FOP_ITERATE;
 	rargs.args.f_iterate.file = file;
 	rargs.args.f_iterate.dir_context = dir_context;
@@ -296,10 +311,17 @@ static int rfs_iterate(struct file *file, struct dir_context *dir_context)
 	if (rargs.rv.rv_int)
 		goto exit;
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0))
 	if (rfs_dcache_get_subs(file->f_dentry, &sibs)) {
 		BUG();
 		goto exit;
 	}
+#else
+	if (rfs_dcache_get_subs(file->f_path.dentry, &sibs)) {
+		BUG();
+		goto exit;
+	}
+#endif
 
 	list_for_each_entry(sib, &sibs, list) {
 		rdentry = rfs_dentry_find(sib->dentry);

@@ -4,7 +4,7 @@
  * Midified by KINTA-JAPAN <sanu@ruby.plala.or.jo>
  *
  * Copyright 2008 - 2010 Frantisek Hrbata
- * Copyright 2013 - 2014 KINTA-JAPAN
+ * Copyright 2013 - 2015 KINTA-JAPAN
  * All rights reserved.
  *
  * This file is part of RedirFS.
@@ -292,7 +292,7 @@ void rfs_inode_cache_destroy(void)
 	kmem_cache_destroy(rfs_inode_cache);
 }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0))
 static struct dentry *rfs_lookup(struct inode *dir, struct dentry *dentry,
 		struct nameidata *nd)
 #else
@@ -318,7 +318,7 @@ static struct dentry *rfs_lookup(struct inode *dir, struct dentry *dentry,
 
 	rargs.args.i_lookup.dir = dir;
 	rargs.args.i_lookup.dentry = dentry;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0))
 	rargs.args.i_lookup.nd = nd;
 #else
 	rargs.args.i_lookup.flags = flags;
@@ -329,7 +329,7 @@ static struct dentry *rfs_lookup(struct inode *dir, struct dentry *dentry,
 			rargs.rv.rv_dentry = rinode->op_old->lookup(
 					rargs.args.i_lookup.dir,
 					rargs.args.i_lookup.dentry,
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0))
 					rargs.args.i_lookup.nd);
 #else
 					rargs.args.i_lookup.flags);
@@ -356,7 +356,7 @@ exit:
 	return rargs.rv.rv_dentry;
 }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0))
 static int rfs_mkdir(struct inode *dir, struct dentry *dentry, int mode)
 #else
 static int rfs_mkdir(struct inode *dir, struct dentry *dentry, umode_t mode)
@@ -405,10 +405,10 @@ static int rfs_mkdir(struct inode *dir, struct dentry *dentry, umode_t mode)
 	return rargs.rv.rv_int;
 }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,3,0))
 static int rfs_create(struct inode *dir, struct dentry *dentry, int mode,
 		struct nameidata *nd)
-#elif LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0)
+#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0))
 static int rfs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 		struct nameidata *nd)
 #else
@@ -434,7 +434,7 @@ static int rfs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 	rargs.args.i_create.dir = dir;
 	rargs.args.i_create.dentry = dentry;
 	rargs.args.i_create.mode = mode;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0))
 	rargs.args.i_create.nd = nd;
 #else
 	rargs.args.i_create.flags = flags;
@@ -446,7 +446,7 @@ static int rfs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 					rargs.args.i_create.dir,
 					rargs.args.i_create.dentry,
 					rargs.args.i_create.mode,
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,6,0))
 					rargs.args.i_create.nd);
 #else
 					rargs.args.i_create.flags);
@@ -561,7 +561,7 @@ static int rfs_symlink(struct inode *dir, struct dentry *dentry,
 	return rargs.rv.rv_int;
 }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 3, 0)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 3, 0))
 static int rfs_mknod(struct inode * dir, struct dentry *dentry, int mode,
 		dev_t rdev)
 #else
@@ -690,7 +690,7 @@ static int rfs_rmdir(struct inode *inode, struct dentry *dentry)
 	return rargs.rv.rv_int;
 }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,27)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,27))
 
 static int rfs_permission(struct inode *inode, int mask, struct nameidata *nd)
 {
@@ -746,7 +746,7 @@ static int rfs_permission(struct inode *inode, int mask, struct nameidata *nd)
 	return rargs.rv.rv_int;
 }
 
-#elif LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38)
+#elif (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38))
 
 static int rfs_permission(struct inode *inode, int mask)
 {
@@ -800,7 +800,7 @@ static int rfs_permission(struct inode *inode, int mask)
 	return rargs.rv.rv_int;
 }
 
-#elif LINUX_VERSION_CODE < KERNEL_VERSION(3,1,0)
+#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3,1,0))
 
 static int rfs_permission(struct inode *inode, int mask, unsigned int flags)
 {
@@ -919,7 +919,7 @@ static int rfs_setattr_default(struct dentry *dentry, struct iattr *iattr)
 	if (rv)
 		return rv;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,34)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,34))
 	if ((iattr->ia_valid & ATTR_UID && iattr->ia_uid != inode->i_uid) ||
 	    (iattr->ia_valid & ATTR_GID && iattr->ia_gid != inode->i_gid))
 		return rfs_dq_transfer(inode, iattr) ? -EDQUOT : 0;

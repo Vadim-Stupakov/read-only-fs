@@ -4,7 +4,7 @@
  * Midified by KINTA-JAPAN <sanu@ruby.plala.or.jo>
  *
  * Copyright 2008 - 2010 Frantisek Hrbata
- * Copyright 2013 - 2014 KINTA-JAPAN
+ * Copyright 2013 - 2015 KINTA-JAPAN
  * All rights reserved.
  *
  * This file is part of RedirFS.
@@ -936,7 +936,7 @@ int rfs_fsrename(struct inode *old_dir, struct dentry *old_dentry,
 
 	if (rroot_src == rroot_dst) 
 		goto exit;
-
+	
 	rv = rfs_fsrename_rem(rroot_src, rroot_dst, old_dentry);
 	if (rv)
 		goto exit;

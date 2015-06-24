@@ -4,7 +4,7 @@
  * Midified by KINTA-JAPAN <sanu@ruby.plala.or.jo>
  *
  * Copyright 2008 - 2010 Frantisek Hrbata
- * Copyright 2013 - 2014 KINTA-JAPAN
+ * Copyright 2013 - 2015 KINTA-JAPAN
  * All rights reserved.
  *
  * This file is part of RedirFS.
@@ -144,7 +144,13 @@ static int rfs_flt_paths_add(redirfs_filter filter, const char *buf,
 	struct rfs_flt *rflt = filter;
 	struct rfs_path *rpath;
 	struct redirfs_path_info info;
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0))
 	struct nameidata nd;
+#else
+	struct rfs_nameidata nd;
+#endif
+
 	char *path;
 	char type;
 	int rv;

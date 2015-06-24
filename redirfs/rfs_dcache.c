@@ -4,7 +4,7 @@
  * Midified by KINTA-JAPAN <sanu@ruby.plala.or.jo>
  *
  * Copyright 2008 - 2010 Frantisek Hrbata
- * Copyright 2013 - 2014 KINTA-JAPAN
+ * Copyright 2013 - 2015 KINTA-JAPAN
  * All rights reserved.
  *
  * This file is part of RedirFS.
@@ -124,6 +124,10 @@ void rfs_dcache_entry_free_list(struct list_head *head)
 
 int rfs_dcache_get_subs_mutex(struct dentry *dir, struct list_head *sibs)
 {
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0))
+	int lock;
+#endif
+
 	int rv = 0;
 
 	if (!dir || !dir->d_inode)
@@ -134,12 +138,10 @@ int rfs_dcache_get_subs_mutex(struct dentry *dir, struct list_head *sibs)
 	rv = rfs_dcache_get_subs(dir, sibs);
 	rfs_inode_mutex_unlock(dir->d_inode);
 #else
-	if (mutex_trylock(&dir->d_inode->i_mutex)){
-		rv = rfs_dcache_get_subs(dir, sibs);
+	lock = mutex_trylock(&dir->d_inode->i_mutex);
+	rv = rfs_dcache_get_subs(dir, sibs);
+	if (lock)
 		mutex_unlock(&dir->d_inode->i_mutex);
-	} else {
-		printk(KERN_INFO "redirfs:warning dentry '%s' is locked.\n", dir->d_name.name);
-	}
 #endif
 
 	return rv;

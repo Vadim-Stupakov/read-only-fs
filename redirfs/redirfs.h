@@ -4,7 +4,7 @@
  * Midified by KINTA-JAPAN <sanu@ruby.plala.or.jo>
  *
  * Copyright 2008 - 2010 Frantisek Hrbata
- * Copyright 2013 - 2014 KINTA-JAPAN
+ * Copyright 2013 - 2015 KINTA-JAPAN
  * All rights reserved.
  *
  * This file is part of RedirFS.
@@ -36,7 +36,7 @@
 #include <linux/aio.h>
 #include <linux/version.h>
 
-#define REDIRFS_VERSION "0.11 EXPERIMENTAL-10C"
+#define REDIRFS_VERSION "0.11 EXPERIMENTAL-12A"
 
 #define REDIRFS_PATH_INCLUDE		1
 #define REDIRFS_PATH_EXCLUDE		2

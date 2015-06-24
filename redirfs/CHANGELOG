@@ -1,3 +1,20 @@
+version 0.11 experimental-12A 2015-03-07
+	* KINTA-JAPAN <sanu@ruby.plala.or.jp>
+	  fixed build error any kernel
+
+version 0.11 experimental-12 2015-03-03
+	* KINTA-JAPAN <sanu@ruby.plala.or.jp>
+	- support for -3.19.x kernels
+
+version 0.11 experimental-11A 2015-02-01
+	* KINTA-JAPAN <sanu@ruby.plala.or.jp>
+	  Update rfs_dcache_get_subs_mutex()
+	  fixed build error kernel 3.2
+
+version 0.11 experimental-11 2015-01-14
+	* KINTA-JAPAN <sanu@ruby.plala.or.jp>
+	- support for -3.18.x kernels
+
 version 0.11 experimental-10C 2014-12-03
 	* KINTA-JAPAN <sanu@ruby.plala.or.jp>
 	- source cleanup

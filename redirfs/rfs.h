@@ -4,7 +4,7 @@
  * Midified by KINTA-JAPAN <sanu@ruby.plala.or.jo>
  *
  * Copyright 2008 - 2010 Frantisek Hrbata
- * Copyright 2013 - 2014 KINTA-JAPAN
+ * Copyright 2013 - 2015 KINTA-JAPAN
  * All rights reserved.
  *
  * This file is part of RedirFS.
@@ -32,6 +32,30 @@
 #include <linux/quotaops.h>
 #include <linux/slab.h>
 #include "redirfs.h"
+
+#ifdef RFS_EXCHANGE_D_CHILD
+#if (RFS_EXCHANGE_D_CHILD == 0)
+#define D_CHILD d_child
+#define D_U_D_CHILD d_u.d_child
+#else
+#define D_CHILD d_u.d_child
+#define D_U_D_CHILD d_child
+#endif
+#else
+#define D_CHILD d_child
+#define D_U_D_CHILD d_u.d_child
+#endif
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0))
+#else
+
+	struct rfs_nameidata {
+		struct path path;
+	};
+
+
+#endif
+
 
 #define RFS_ADD_OP(ops_new, op) \
 	(ops_new.op = rfs_##op)
@@ -80,7 +104,8 @@ struct rfs_file;
 #define rfs_mutex_init(mutex) init_MUTEX(mutex)
 #define rfs_mutex_lock(mutex) down(mutex)
 #define rfs_mutex_unlock(mutex) up(mutex)
-#define rfs_for_each_d_child(pos, head) list_for_each_entry(pos, head, d_child)
+#define rfs_for_each_d_child(pos, head) list_for_each_entry(pos, head, D_CHILD)
+
 inline static void rfs_inode_mutex_lock(struct inode *inode)
 {
 	down(&inode->i_sem);
@@ -89,13 +114,30 @@ inline static void rfs_inode_mutex_unlock(struct inode *inode)
 {
 	up(&inode->i_sem);
 }
+#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3,18,0))
+#define rfs_mutex_t mutex
+#define RFS_DEFINE_MUTEX(mutex) DEFINE_MUTEX(mutex)
+#define rfs_mutex_init(mutex) mutex_init(mutex)
+#define rfs_mutex_lock(mutex) mutex_lock(mutex)
+#define rfs_mutex_unlock(mutex) mutex_unlock(mutex)
+#define rfs_for_each_d_child(pos, head) list_for_each_entry(pos, head, D_U_D_CHILD)
+
+inline static void rfs_inode_mutex_lock(struct inode *inode)
+{
+	mutex_lock(&inode->i_mutex);
+}
+inline static void rfs_inode_mutex_unlock(struct inode *inode)
+{
+	mutex_unlock(&inode->i_mutex);
+}
 #else
 #define rfs_mutex_t mutex
 #define RFS_DEFINE_MUTEX(mutex) DEFINE_MUTEX(mutex)
 #define rfs_mutex_init(mutex) mutex_init(mutex)
 #define rfs_mutex_lock(mutex) mutex_lock(mutex)
 #define rfs_mutex_unlock(mutex) mutex_unlock(mutex)
-#define rfs_for_each_d_child(pos, head) list_for_each_entry(pos, head, d_u.d_child)
+#define rfs_for_each_d_child(pos, head) list_for_each_entry(pos, head, D_CHILD)
+
 inline static void rfs_inode_mutex_lock(struct inode *inode)
 {
 	mutex_lock(&inode->i_mutex);
@@ -504,7 +546,7 @@ static inline struct vfsmount *rfs_nameidata_mnt(struct nameidata *nd)
 	return nd->mnt;
 }
 
-#else
+#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0))
 
 static inline void rfs_nameidata_put(struct nameidata *nd)
 {
@@ -517,6 +559,23 @@ static inline struct dentry *rfs_nameidata_dentry(struct nameidata *nd)
 }
 
 static inline struct vfsmount *rfs_nameidata_mnt(struct nameidata *nd)
+{
+	return nd->path.mnt;
+}
+
+#else
+
+static inline void rfs_nameidata_put(struct rfs_nameidata *nd)
+{
+	path_put(&nd->path);
+}
+
+static inline struct dentry *rfs_nameidata_dentry(struct rfs_nameidata *nd)
+{
+	return nd->path.dentry;
+}
+
+static inline struct vfsmount *rfs_nameidata_mnt(struct rfs_nameidata *nd)
 {
 	return nd->path.mnt;
 }
@@ -592,13 +651,6 @@ static inline struct dentry *rfs_dget_locked(struct dentry *d)
 
 #endif
 
-static inline void rfs_dput(struct dentry *d)
-{
-	dput(d);
-}
-
-#define dput(d) rfs_dput(d)
-
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,39))
 
 static inline int rfs_path_lookup(const char *name, struct nameidata *nd)
@@ -606,9 +658,24 @@ static inline int rfs_path_lookup(const char *name, struct nameidata *nd)
 	return path_lookup(name, LOOKUP_FOLLOW, nd);
 }
 
-#else
+#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0))
 
 static inline int rfs_path_lookup(const char *name, struct nameidata *nd)
+{
+	struct path path;
+	int rv;
+
+	rv = kern_path(name, LOOKUP_FOLLOW, &path);
+	if (rv)
+		return rv;
+
+	nd->path = path;
+	return 0;
+}
+
+#else
+
+static inline int rfs_path_lookup(const char *name, struct rfs_nameidata *nd)
 {
 	struct path path;
 	int rv;
