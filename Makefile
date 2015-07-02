@@ -2,8 +2,8 @@ KERNEL_VERS = `uname -r`
 #KERNEL_VERS = 3.13.0-24-generic
 KERNEL_BUILDDIR = /lib/modules/$(KERNEL_VERS)/build
 ROOT_PATH=`pwd`
-FILTER_DIR="roflt"
-REDIRFS_DIR="redirfs"
+FILTER_DIR="$(ROOT_PATH)/roflt"
+REDIRFS_DIR="$(ROOT_PATH)/redirfs"
 
 ifndef EXCHANGE
 	EXTRA_CFLAGS=-DRFS_EXCHANGE_D_CHILD=0
@@ -12,15 +12,16 @@ else
 endif
 
 all:
-	make -C $(KERNEL_BUILDDIR) M=$(ROOT_PATH)/$(REDIRFS_DIR) EXTRA_CFLAGS=$(EXTRA_CFLAGS) modules
-	cp $(ROOT_PATH)/$(REDIRFS_DIR)/Module.symvers $(ROOT_PATH)/$(FILTER_DIR)
-	make -C $(KERNEL_BUILDDIR) M=$(ROOT_PATH)/$(FILTER_DIR) EXTRA_CFLAGS=-I$(ROOT_PATH)/$(REDIRFS_DIR) modules
+	make -C $(KERNEL_BUILDDIR) M=$(REDIRFS_DIR) EXTRA_CFLAGS=$(EXTRA_CFLAGS) modules
+	cp $(REDIRFS_DIR)/Module.symvers $(FILTER_DIR)
+	make -C $(KERNEL_BUILDDIR) M=$(FILTER_DIR) EXTRA_CFLAGS=-I$(REDIRFS_DIR) modules
 
 install:
-	make -C $(KERNEL_BUILDDIR) M=$(ROOT_PATH)/$(REDIRFS_DIR) modules_install
-	make -C $(KERNEL_BUILDDIR) M=$(ROOT_PATH)/$(FILTER_DIR) EXTRA_CFLAGS=-I$(ROOT_PATH)/$(REDIRFS_DIR) modules_install
+	make -C $(KERNEL_BUILDDIR) M=$(REDIRFS_DIR) modules_install
+	make -C $(KERNEL_BUILDDIR) M=$(FILTER_DIR) EXTRA_CFLAGS=-I$(REDIRFS_DIR) modules_install
 
 clean:
-	make -C $(KERNEL_BUILDDIR) M=$(ROOT_PATH)/$(FILTER_DIR) EXTRA_CFLAGS=-I$(ROOT_PATH)/$(REDIRFS_DIR) clean
-	make -C $(KERNEL_BUILDDIR) M=$(ROOT_PATH)/$(REDIRFS_DIR) clean
-	rm -rf ./*/Module*.symvers ./*/Module*.symvers rm -rf ./*/*.mod.c ./*/*.mod.c ./*/*.o ./*/*.cmd
+	make -C $(KERNEL_BUILDDIR) M=$(FILTER_DIR) EXTRA_CFLAGS=-I$(REDIRFS_DIR) clean
+	make -C $(KERNEL_BUILDDIR) M=$(REDIRFS_DIR) clean
+	# remove all exept *.c and
+	find $(FILTER_DIR)/ $(REDIRFS_DIR)/ -mindepth 1 ! -name "*.c" ! -name "*.h" ! -name "Makefile" ! -name "README" | xargs -I {} -t rm -rf {}
