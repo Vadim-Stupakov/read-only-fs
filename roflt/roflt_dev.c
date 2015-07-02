@@ -117,19 +117,19 @@ int init_module(void){ /* Constructor */
         FILTER_LOG_CRIT("Error. Error code = %d", err);
         return err;
     }
-    if(!roflt_init_char_dev(roflt_file_name, roflt_dev_name)){
-        FILTER_LOG_INFO(KERN_INFO "%s: registered", roflt_dev_name);
-    }
-    else{
-        FILTER_LOG_INFO(KERN_INFO "%s: not registered", roflt_dev_name);
-    }
+//    if(!roflt_init_char_dev(roflt_file_name, roflt_dev_name)){
+//        FILTER_LOG_INFO(KERN_INFO "%s: registered", roflt_dev_name);
+//    }
+//    else{
+//        FILTER_LOG_INFO(KERN_INFO "%s: not registered", roflt_dev_name);
+//    }
     return (0);
 }
 
 void cleanup_module(void){ /* Destructor */
-    redirfs_delete_filter(roflt_flt);
+//    redirfs_delete_filter(roflt_flt);
     FILTER_LOG_INFO(KERN_INFO "%s: unregistered", roflt_dev_name);
     roflt_unregister();
-    roflt_clean_char_dev();
+//    roflt_clean_char_dev();
 }
 

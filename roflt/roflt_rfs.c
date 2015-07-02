@@ -11,43 +11,75 @@ ssize_t roflt_write(struct file* file, const char __user * buf, size_t size, lof
     return -EROFS;
 }
 
-static struct file_operations fops;
+static struct file_operations roflt_fops;
 
-enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *rargs){
+enum redirfs_rv roflt_post_callback(redirfs_context cont, struct redirfs_args *rargs){
     FILTER_LOG_DEBUG("%s", "");
     if(rargs->args.f_open.file->f_op->write != roflt_write){
-        memcpy(&fops, rargs->args.f_open.file->f_op, sizeof(fops));
-        fops.owner = THIS_MODULE;
-        fops.write = roflt_write;
-        rargs->args.f_open.file->f_op = &fops;
-        FILTER_LOG_DEBUG("%s", "fops");
+
+
+        printk("Before\n");
+        printk("\trargs->args.f_open.file = %p\n", rargs->args.f_open.file);
+        if(rargs->args.f_open.file)
+        {
+            printk("\trargs->args.f_open.file->f_op = %p\n", rargs->args.f_open.file->f_op);
+            if(rargs->args.f_open.file->f_op)
+            {
+                printk("\trargs->args.f_open.file->f_op->write = %p\n", rargs->args.f_open.file->f_op->write);
+                printk("\trargs->args.f_open.file->f_op->open = %p\n", rargs->args.f_open.file->f_op->open);
+            }
+        }
+
+//        memcpy(&roflt_fops, rargs->args.f_open.file->f_op, sizeof(roflt_fops));
+//        roflt_fops.owner = THIS_MODULE;
+//        roflt_fops.write = roflt_write;
+
+//        rargs->args.f_open.file->f_op = &roflt_fops;
+
+        struct file_operations* fop = (struct file_operations*)(rargs->args.f_open.file->f_op);
+        fop->write = roflt_write;
+
+
+        printk("After\n");
+        printk("\trargs->args.f_open.file = %p\n", rargs->args.f_open.file);
+        if(rargs->args.f_open.file)
+        {
+            printk("\trargs->args.f_open.file->f_op = %p\n", rargs->args.f_open.file->f_op);
+            if(rargs->args.f_open.file->f_op)
+            {
+                printk("\trargs->args.f_open.file->f_op->write = %p\n", rargs->args.f_open.file->f_op->write);
+                printk("\trargs->args.f_open.file->f_op->open = %p\n", rargs->args.f_open.file->f_op->open);
+            }
+        }
+
         return REDIRFS_CONTINUE;
     }
     return REDIRFS_CONTINUE;
 }
 
-enum redirfs_rv roflt_post_callback(redirfs_context cont, struct redirfs_args *rargs){
+enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *rargs){
     FILTER_LOG_DEBUG("%s", "");
     return REDIRFS_CONTINUE;
 }
 
 static struct redirfs_op_info roflt_op_info[] =
 {
-    {REDIRFS_REG_FOP_OPEN,      roflt_pre_callback, NULL},
-    {REDIRFS_DIR_FOP_OPEN,      roflt_pre_callback, NULL},
-    {REDIRFS_LNK_FOP_OPEN,      roflt_pre_callback, NULL},
-    {REDIRFS_CHR_FOP_OPEN,      roflt_pre_callback, NULL},
-    {REDIRFS_BLK_FOP_OPEN,      roflt_pre_callback, NULL},
-    {REDIRFS_FIFO_FOP_OPEN,     roflt_pre_callback, NULL},
+    {REDIRFS_REG_FOP_OPEN,      roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_DIR_FOP_OPEN,      roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_LNK_FOP_OPEN,      roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_CHR_FOP_OPEN,      roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_BLK_FOP_OPEN,      roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_FIFO_FOP_OPEN,     roflt_pre_callback, roflt_post_callback},
     {REDIRFS_OP_END,            NULL,               NULL}
 };
 
 static struct redirfs_filter_operations roflt_ops =
 {
-    .activate   = roflt_activate,
-    .add_path   = roflt_add_path,
-    .unregister = roflt_unregister,
-    .pre_rename = roflt_pre_callback
+//    .activate   = roflt_activate,
+//    .add_path   = roflt_add_path,
+//    .unregister = roflt_unregister,
+    .pre_rename = roflt_pre_callback,
+    .post_rename = roflt_post_callback
 };
 
 static struct redirfs_filter_info roflt_info =
