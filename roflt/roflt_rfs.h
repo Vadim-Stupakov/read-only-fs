@@ -4,7 +4,7 @@
 #include "rfs.h"
 #include "roflt_util.h"
 
-enum redirfs_rv roflt_post_callback(redirfs_context cont, struct redirfs_args *rargs);
+//enum redirfs_rv roflt_post_callback(redirfs_context cont, struct redirfs_args *rargs);
 enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *rargs);
 int roflt_init_rfs(void);
 int roflt_unregister(void);
