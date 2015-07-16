@@ -1,10 +1,8 @@
 #include "roflt_rfs.h"
+#include <linux/limits.h>
+#include <linux/dcache.h>
 
 redirfs_filter roflt_flt;
-
-#define MODULE_NAME     "roflt"
-#define MODULE_PRIORITY 60321
-#define MODULE_STATUS   1
 
 static int roflt_create (struct inode* inode, struct dentry* dentry, umode_t mode, bool flag){
     FILTER_LOG_DEBUG("%s", "");
@@ -36,7 +34,8 @@ static int roflt_mknod (struct inode* inode, struct dentry* dentry, umode_t mode
     return -EROFS;
 }
 
-static int roflt_rename (struct inode* inode, struct dentry* dentry1, struct inode* dentry2, struct dentry* dentry3){
+static int roflt_rename (struct inode* inode, struct dentry* dentry1, struct inode* dentry2,
+                         struct dentry* dentry3){
     FILTER_LOG_DEBUG("%s", "");
     return -EROFS;
 }
@@ -73,6 +72,7 @@ enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *ra
             goto error;
         }
         return REDIRFS_STOP;
+
     }
     else if(id == REDIRFS_DIR_IOP_MKDIR && rargs->args.i_mkdir.dir->i_op->mkdir != roflt_mkdir){
         FILTER_LOG_DEBUG("\t%s", "mkdir");
@@ -110,7 +110,8 @@ enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *ra
         }
         return REDIRFS_STOP;
     }
-    else if(id == REDIRFS_DIR_IOP_PERMISSION && rargs->args.i_permission.inode->i_op->permission != roflt_permission){
+    else if((id == REDIRFS_DIR_IOP_PERMISSION || id == REDIRFS_REG_IOP_PERMISSION) &&
+            rargs->args.i_permission.inode->i_op->permission != roflt_permission){
         FILTER_LOG_DEBUG("\t%s", "permission");
 
         i_op = (struct inode_operations*)(rargs->args.i_permission.inode->i_op);
@@ -134,7 +135,8 @@ enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *ra
         }
         return REDIRFS_STOP;
     }
-    else if(id == REDIRFS_DIR_IOP_RENAME && rargs->args.i_rename.old_dir->i_op->rename != roflt_rename){
+    else if(id == REDIRFS_DIR_IOP_RENAME &&
+            rargs->args.i_rename.old_dir->i_op->rename != roflt_rename){
         FILTER_LOG_DEBUG("\t%s", "rename");
 
         i_op = (struct inode_operations*)(rargs->args.i_rename.old_dir->i_op);
@@ -158,7 +160,8 @@ enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *ra
         }
         return REDIRFS_STOP;
     }
-    else if(id == REDIRFS_DIR_IOP_SETATTR && rargs->args.i_setattr.dentry->d_inode->i_op->setattr != roflt_setattr){
+    else if((id == REDIRFS_DIR_IOP_SETATTR || id == REDIRFS_REG_IOP_SETATTR) &&
+            rargs->args.i_setattr.dentry->d_inode->i_op->setattr != roflt_setattr){
         FILTER_LOG_DEBUG("\t%s", "setattr");
 
         i_op = (struct inode_operations*)(rargs->args.i_setattr.dentry->d_inode->i_op);
@@ -170,7 +173,8 @@ enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *ra
         }
         return REDIRFS_STOP;
     }
-    else if(id == REDIRFS_DIR_IOP_SYMLINK && rargs->args.i_symlink.dir->i_op->symlink != roflt_symlink){
+    else if(id == REDIRFS_DIR_IOP_SYMLINK &&
+            rargs->args.i_symlink.dir->i_op->symlink != roflt_symlink){
         FILTER_LOG_DEBUG("\t%s", "symlink");
 
         i_op = (struct inode_operations*)(rargs->args.i_symlink.dir->i_op);
@@ -193,17 +197,20 @@ error:
 
 static struct redirfs_op_info roflt_op_info[] =
 {
-    {REDIRFS_DIR_IOP_CREATE,    roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_MKDIR,     roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_LINK,      roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_UNLINK,    roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_PERMISSION,roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_MKNOD,     roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_RENAME,    roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_RMDIR,     roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_SETATTR,   roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_SYMLINK,   roflt_pre_callback, NULL},
-    {REDIRFS_OP_END,            NULL,               NULL}
+    {REDIRFS_DIR_IOP_CREATE,     roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_MKDIR,      roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_LINK,       roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_UNLINK,     roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_PERMISSION, roflt_pre_callback, NULL},
+    {REDIRFS_REG_IOP_PERMISSION, roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_MKNOD,      roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_RENAME,     roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_RMDIR,      roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_SETATTR,    roflt_pre_callback, NULL},
+    {REDIRFS_REG_IOP_SETATTR,    roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_SYMLINK,    roflt_pre_callback, NULL},
+
+    {REDIRFS_OP_END,             NULL,               NULL}
 };
 
 static struct redirfs_filter_operations roflt_ops =

@@ -4,6 +4,10 @@
 #include "rfs.h"
 #include "roflt_util.h"
 
+#define MODULE_NAME     "roflt"
+#define MODULE_PRIORITY 60321
+#define MODULE_STATUS   1
+
 //enum redirfs_rv roflt_post_callback(redirfs_context cont, struct redirfs_args *rargs);
 enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *rargs);
 int roflt_init_rfs(void);

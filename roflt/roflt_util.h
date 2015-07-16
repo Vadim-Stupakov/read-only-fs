@@ -3,11 +3,14 @@
 
 #include <linux/kernel.h>
 
+#define LOG_LEVEL_NONE  0
+#define LOG_LEVEL_DEBUG 1
+#define LOG_LEVEL_INFO  2
+#define LOG_LEVEL_CRIT  3
+
+#define LOG_LEVEL LOG_LEVEL_CRIT
+
 #define GET_FILE_LINE_FUNC_ARG __FILE__, __LINE__, __FUNCTION__
-
-#define DEBUG 3
-
-#ifdef DEBUG
 
 #define PRINT_DUMP_STACK\
     do{\
@@ -16,22 +19,26 @@
         printk("\n\nDump stack end:\n\n");\
     }while(0);
 
-#if DEBUG > 0
-#define FILTER_LOG_INFO(format, args...)\
-    printk(KERN_INFO "File:(%s), Line:(%u), Function:(%s)\n\tMessage: "format"\n", GET_FILE_LINE_FUNC_ARG, args);
+#if LOG_LEVEL >= LOG_LEVEL_DEBUG
+    #define FILTER_LOG_DEBUG(format, args...)\
+        printk(KERN_DEBUG "File:(%s), Line:(%u), Function:(%s)\n\tMessage: "format"\n", GET_FILE_LINE_FUNC_ARG, args);
+
+#else
+    #define FILTER_LOG_DEBUG(format, args...)
 #endif
 
-#if DEBUG > 1
-#define FILTER_LOG_DEBUG(format, args...)\
-    printk(KERN_DEBUG "File:(%s), Line:(%u), Function:(%s)\n\tMessage: "format"\n", GET_FILE_LINE_FUNC_ARG, args);
+#if LOG_LEVEL >= LOG_LEVEL_INFO
+    #define FILTER_LOG_INFO(format, args...)\
+        printk(KERN_INFO "File:(%s), Line:(%u), Function:(%s)\n\tMessage: "format"\n", GET_FILE_LINE_FUNC_ARG, args);
+#else
+    #define FILTER_LOG_INFO(format, args...)
 #endif
 
-#if DEBUG > 2
-#define FILTER_LOG_CRIT(format, args...)\
-    printk(KERN_CRIT "File:(%s), Line:(%u), Function:(%s)\n\tMessage: "format"\n", GET_FILE_LINE_FUNC_ARG, args);
+#if LOG_LEVEL >= LOG_LEVEL_CRIT
+    #define FILTER_LOG_CRIT(format, args...)\
+        printk(KERN_CRIT "File:(%s), Line:(%u), Function:(%s)\n\tMessage: "format"\n", GET_FILE_LINE_FUNC_ARG, args);
+#else
+    #define FILTER_LOG_CRIT(format, args...)
 #endif
-
-#endif //#ifdef DEBUG
-
 
 #endif // ROFLT_UTIL_H

@@ -24,4 +24,5 @@ clean:
 	make -C $(KERNEL_BUILDDIR) M=$(FILTER_DIR) EXTRA_CFLAGS=-I$(REDIRFS_DIR) clean
 	make -C $(KERNEL_BUILDDIR) M=$(REDIRFS_DIR) clean
 	# remove all exept *.c and
-	find $(FILTER_DIR)/ $(REDIRFS_DIR)/ -mindepth 1 ! -name "*.c" ! -name "*.h" ! -name "Makefile" ! -name "README" | xargs -I {} -t rm -rf {}
+	find $(FILTER_DIR)/ $(REDIRFS_DIR)/ -mindepth 1 ! -name "*.c" ! -name "*.h" ! -name "Makefile" ! -name "README" | \
+    xargs -I {} -t rm -rf {}

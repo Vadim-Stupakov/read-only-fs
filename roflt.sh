@@ -8,13 +8,11 @@ SYSFS_PATH="/sys/fs/${REDIRFS}/filters/${FILTER}"
 
 load(){
     insmod "${REDIRFS}/${REDIRFS}.ko"
-    sleep 5
     insmod "${FILTER}/${FILTER}.ko"
     echo "1" > "${SYSFS_PATH}/active"
 }
 
 addPaths(){
-    sleep 5
     local path="${1}"
     echo "a:i:${path}" > "${SYSFS_PATH}/paths"
 }
