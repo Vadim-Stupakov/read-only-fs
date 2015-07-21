@@ -8,7 +8,7 @@
 #define LOG_LEVEL_INFO  2
 #define LOG_LEVEL_DEBUG 3
 
-#define LOG_LEVEL LOG_LEVEL_CRIT
+#define LOG_LEVEL LOG_LEVEL_DEBUG
 
 #define GET_FILE_LINE_FUNC_ARG __FILE__, __LINE__, __FUNCTION__
 
@@ -36,7 +36,7 @@
 
 #if LOG_LEVEL >= LOG_LEVEL_DEBUG
     #define FILTER_LOG_DEBUG(format, args...)\
-        printk(KERN_DEBUG "File:(%s), Line:(%u), Function:(%s)\n\tMessage: "format"\n", GET_FILE_LINE_FUNC_ARG, args);sss
+        printk(KERN_DEBUG "File:(%s), Line:(%u), Function:(%s)\n\tMessage: "format"\n", GET_FILE_LINE_FUNC_ARG, args);
 #else
     #define FILTER_LOG_DEBUG(format, args...)
 #endif

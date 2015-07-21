@@ -56,6 +56,11 @@ static int roflt_symlink (struct inode* inode, struct dentry* dentry, const char
     return -EROFS;
 }
 
+enum redirfs_rv roflt_post_callback(redirfs_context cont, struct redirfs_args *rargs){
+    FILTER_LOG_DEBUG("%s", "");
+    return REDIRFS_STOP;
+}
+
 enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *rargs){
     struct inode_operations* i_op = NULL;
     enum redirfs_op_id id = 0;
@@ -198,18 +203,18 @@ error:
 
 static struct redirfs_op_info roflt_op_info[] =
 {
-    {REDIRFS_DIR_IOP_CREATE,     roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_MKDIR,      roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_LINK,       roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_UNLINK,     roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_PERMISSION, roflt_pre_callback, NULL},
-    {REDIRFS_REG_IOP_PERMISSION, roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_MKNOD,      roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_RENAME,     roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_RMDIR,      roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_SETATTR,    roflt_pre_callback, NULL},
-    {REDIRFS_REG_IOP_SETATTR,    roflt_pre_callback, NULL},
-    {REDIRFS_DIR_IOP_SYMLINK,    roflt_pre_callback, NULL},
+    {REDIRFS_DIR_IOP_CREATE,     roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_DIR_IOP_MKDIR,      roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_DIR_IOP_LINK,       roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_DIR_IOP_UNLINK,     roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_DIR_IOP_PERMISSION, roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_REG_IOP_PERMISSION, roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_DIR_IOP_MKNOD,      roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_DIR_IOP_RENAME,     roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_DIR_IOP_RMDIR,      roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_DIR_IOP_SETATTR,    roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_REG_IOP_SETATTR,    roflt_pre_callback, roflt_post_callback},
+    {REDIRFS_DIR_IOP_SYMLINK,    roflt_pre_callback, roflt_post_callback},
 
     {REDIRFS_OP_END,             NULL,               NULL}
 };
