@@ -1,6 +1,7 @@
-#include "roflt_rfs.h"
 #include <linux/limits.h>
 #include <linux/dcache.h>
+
+#include "roflt_rfs.h"
 
 redirfs_filter roflt_flt;
 
@@ -213,20 +214,12 @@ static struct redirfs_op_info roflt_op_info[] =
     {REDIRFS_OP_END,             NULL,               NULL}
 };
 
-static struct redirfs_filter_operations roflt_ops =
-{
-    .activate   = roflt_activate,
-    .add_path   = roflt_add_path,
-    .unregister = roflt_unregister
-};
-
 static struct redirfs_filter_info roflt_info =
 {
     .owner    = THIS_MODULE,
     .name     = MODULE_NAME,
     .priority = MODULE_PRIORITY,
-    .active   = MODULE_STATUS,
-    .ops      = &roflt_ops
+    .active   = MODULE_STATUS
 };
 
 
@@ -274,40 +267,3 @@ int roflt_unregister(void){
     return rv;
 }
 
-int roflt_add_path(struct redirfs_path_info *info)
-{
-    redirfs_path path = {0};
-    redirfs_root root = {0};
-
-    path = redirfs_add_path(roflt_flt, info);
-    if (IS_ERR(path)){
-        FILTER_LOG_CRIT("%s", "reditfs_add_path() error!");
-        return PTR_ERR(path);
-    }
-
-    root = redirfs_get_root_path(path);
-    redirfs_put_path(path);
-    if (!root){
-        FILTER_LOG_CRIT("%s", "redirfs_put_path() error!");
-        return 0;
-    }
-    redirfs_put_root(root);
-
-    FILTER_LOG_INFO("%s", "successful!");
-    return 0;
-}
-
-
-int roflt_activate(void)
-{
-    int rv = redirfs_activate_filter(roflt_flt);
-
-    if(!rv){
-        FILTER_LOG_INFO("%s", "successful!");
-    }
-    else{
-        FILTER_LOG_INFO("%s", "successful!");
-    }
-
-    return rv;
-}

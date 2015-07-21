@@ -9,7 +9,7 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Vadim Stupakov");
 MODULE_DESCRIPTION("Read only VFS filter for redirfs");
 
-int init_module(void){ /* Constructor */
+int init_module(void){
     int err = 0;
 
     err = roflt_init_rfs();
@@ -21,8 +21,15 @@ int init_module(void){ /* Constructor */
     return (0);
 }
 
-void cleanup_module(void){ /* Destructor */
-    FILTER_LOG_INFO(KERN_INFO "%s: unregistered", MODULE_NAME);
-    roflt_unregister();
+void cleanup_module(void){
+    int ret = 0;
+    FILTER_LOG_INFO("%s: unregistered", MODULE_NAME);
+    ret = roflt_unregister();
+    if(ret){
+        FILTER_LOG_CRIT("%s uregister error! Error code = %d", MODULE_NAME, ret);
+    }
+    else{
+        FILTER_LOG_INFO("Module %s was unregistered.", MODULE_NAME);
+    }
 }
 
