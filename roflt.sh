@@ -43,6 +43,6 @@ if [ "${ARG}" == "add-path" ];then
     if [ "${path}" != "" ]; then
         addPaths "${path}"
     else
-        echo "Please, enter path as a second parameter"
+        echo "Please, enter a path as the second parameter"
     fi
 fi
