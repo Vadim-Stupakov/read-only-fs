@@ -63,134 +63,191 @@ enum redirfs_rv roflt_post_callback(redirfs_context cont, struct redirfs_args *r
 
 enum redirfs_rv roflt_pre_callback(redirfs_context cont, struct redirfs_args *rargs){
     struct inode_operations* i_op = NULL;
-    enum redirfs_op_id id = 0;
+    int id = 0;
 
     id = rargs->type.id;
 
-    if(id == REDIRFS_DIR_IOP_CREATE && rargs->args.i_create.dir->i_op->create != roflt_create){
-        FILTER_LOG_DEBUG("\t%s", "create");
+    switch (id) {
+    case REDIRFS_DIR_IOP_CREATE:
+        if(rargs->args.i_create.dir->i_op->create != roflt_create){
+            FILTER_LOG_DEBUG("\t%s", "create");
 
-        i_op = (struct inode_operations*)(rargs->args.i_create.dir->i_op);
-        if(i_op){
-            i_op->create = roflt_create;
-        }
-        else{
-            goto error;
-        }
-        return REDIRFS_STOP;
+            i_op = (struct inode_operations*)(rargs->args.i_create.dir->i_op);
+            if(i_op){
+                i_op->create = roflt_create;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
 
-    }
-    else if(id == REDIRFS_DIR_IOP_MKDIR && rargs->args.i_mkdir.dir->i_op->mkdir != roflt_mkdir){
-        FILTER_LOG_DEBUG("\t%s", "mkdir");
+        }
+        break;
 
-        i_op = (struct inode_operations*)(rargs->args.i_mkdir.dir->i_op);
-        if(i_op){
-            i_op->mkdir = roflt_mkdir;
-        }
-        else{
-            goto error;
-        }
-        return REDIRFS_STOP;
-    }
-    else if(id == REDIRFS_DIR_IOP_LINK && rargs->args.i_link.dir->i_op->link != roflt_link){
-        FILTER_LOG_DEBUG("\t%s", "link");
+    case REDIRFS_DIR_IOP_MKDIR:
+        if(rargs->args.i_mkdir.dir->i_op->mkdir != roflt_mkdir){
+            FILTER_LOG_DEBUG("\t%s", "mkdir");
 
-        i_op = (struct inode_operations*)(rargs->args.i_link.dir->i_op);
-        if(i_op){
-            i_op->link = roflt_link;
+            i_op = (struct inode_operations*)(rargs->args.i_mkdir.dir->i_op);
+            if(i_op){
+                i_op->mkdir = roflt_mkdir;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
         }
-        else{
-            goto error;
-        }
-        return REDIRFS_STOP;
-    }
-    else if(id == REDIRFS_DIR_IOP_UNLINK && rargs->args.i_unlink.dir->i_op->unlink != roflt_unlink){
-        FILTER_LOG_DEBUG("\t%s", "unlink");
+        break;
 
-        i_op = (struct inode_operations*)(rargs->args.i_unlink.dir->i_op);
-        if(i_op){
-            i_op->unlink = roflt_unlink;
-        }
-        else{
-            goto error;
-        }
-        return REDIRFS_STOP;
-    }
-    else if((id == REDIRFS_DIR_IOP_PERMISSION || id == REDIRFS_REG_IOP_PERMISSION) &&
-            rargs->args.i_permission.inode->i_op->permission != roflt_permission){
-        FILTER_LOG_DEBUG("\t%s", "permission");
+    case REDIRFS_DIR_IOP_LINK:
+        if(rargs->args.i_link.dir->i_op->link != roflt_link){
+            FILTER_LOG_DEBUG("\t%s", "link");
 
-        i_op = (struct inode_operations*)(rargs->args.i_permission.inode->i_op);
-        if(i_op){
-            i_op->permission = roflt_permission;
+            i_op = (struct inode_operations*)(rargs->args.i_link.dir->i_op);
+            if(i_op){
+                i_op->link = roflt_link;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
         }
-        else{
-            goto error;
-        }
-        return REDIRFS_STOP;
-    }
-    else if(id == REDIRFS_DIR_IOP_MKNOD && rargs->args.i_mknod.dir->i_op->mknod != roflt_mknod){
-        FILTER_LOG_DEBUG("\t%s", "mknod");
+        break;
 
-        i_op = (struct inode_operations*)(rargs->args.i_mknod.dir->i_op);
-        if(i_op){
-            i_op->mknod = roflt_mknod;
-        }
-        else{
-            goto error;
-        }
-        return REDIRFS_STOP;
-    }
-    else if(id == REDIRFS_DIR_IOP_RENAME &&
-            rargs->args.i_rename.old_dir->i_op->rename != roflt_rename){
-        FILTER_LOG_DEBUG("\t%s", "rename");
+    case REDIRFS_DIR_IOP_UNLINK:
+        if(rargs->args.i_unlink.dir->i_op->unlink != roflt_unlink){
+            FILTER_LOG_DEBUG("\t%s", "unlink");
 
-        i_op = (struct inode_operations*)(rargs->args.i_rename.old_dir->i_op);
-        if(i_op){
-            i_op->rename = roflt_rename;
+            i_op = (struct inode_operations*)(rargs->args.i_unlink.dir->i_op);
+            if(i_op){
+                i_op->unlink = roflt_unlink;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
         }
-        else{
-            goto error;
-        }
-        return REDIRFS_STOP;
-    }
-    else if(id == REDIRFS_DIR_IOP_RMDIR && rargs->args.i_rmdir.dir->i_op->rmdir != roflt_rmdir){
-        FILTER_LOG_DEBUG("\t%s", "rmdir");
+        break;
 
-        i_op = (struct inode_operations*)(rargs->args.i_rmdir.dir->i_op);
-        if(i_op){
-            i_op->rmdir = roflt_rmdir;
-        }
-        else{
-            goto error;
-        }
-        return REDIRFS_STOP;
-    }
-    else if((id == REDIRFS_DIR_IOP_SETATTR || id == REDIRFS_REG_IOP_SETATTR) &&
-            rargs->args.i_setattr.dentry->d_inode->i_op->setattr != roflt_setattr){
-        FILTER_LOG_DEBUG("\t%s", "setattr");
+    case REDIRFS_DIR_IOP_PERMISSION:
+        if(rargs->args.i_permission.inode->i_op->permission != roflt_permission){
+            FILTER_LOG_DEBUG("\t%s", "permission");
 
-        i_op = (struct inode_operations*)(rargs->args.i_setattr.dentry->d_inode->i_op);
-        if(i_op){
-            i_op->setattr = roflt_setattr;
+            i_op = (struct inode_operations*)(rargs->args.i_permission.inode->i_op);
+            if(i_op){
+                i_op->permission = roflt_permission;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
         }
-        else{
-            goto error;
-        }
-        return REDIRFS_STOP;
-    }
-    else if(id == REDIRFS_DIR_IOP_SYMLINK &&
-            rargs->args.i_symlink.dir->i_op->symlink != roflt_symlink){
-        FILTER_LOG_DEBUG("\t%s", "symlink");
+        break;
 
-        i_op = (struct inode_operations*)(rargs->args.i_symlink.dir->i_op);
-        if(i_op){
-            i_op->symlink = roflt_symlink;
+    case REDIRFS_REG_IOP_PERMISSION:
+        if(rargs->args.i_permission.inode->i_op->permission != roflt_permission){
+            FILTER_LOG_DEBUG("\t%s", "permission");
+
+            i_op = (struct inode_operations*)(rargs->args.i_permission.inode->i_op);
+            if(i_op){
+                i_op->permission = roflt_permission;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
         }
-        else{
-            goto error;
+        break;
+
+    case REDIRFS_DIR_IOP_MKNOD:
+        if(rargs->args.i_mknod.dir->i_op->mknod != roflt_mknod){
+            FILTER_LOG_DEBUG("\t%s", "mknod");
+
+            i_op = (struct inode_operations*)(rargs->args.i_mknod.dir->i_op);
+            if(i_op){
+                i_op->mknod = roflt_mknod;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
         }
-        return REDIRFS_STOP;
+        break;
+
+    case REDIRFS_DIR_IOP_RENAME:
+        if(rargs->args.i_rename.old_dir->i_op->rename != roflt_rename){
+            FILTER_LOG_DEBUG("\t%s", "rename");
+
+            i_op = (struct inode_operations*)(rargs->args.i_rename.old_dir->i_op);
+            if(i_op){
+                i_op->rename = roflt_rename;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
+        }
+        break;
+
+    case REDIRFS_DIR_IOP_RMDIR:
+        if(rargs->args.i_rmdir.dir->i_op->rmdir != roflt_rmdir){
+            FILTER_LOG_DEBUG("\t%s", "rmdir");
+
+            i_op = (struct inode_operations*)(rargs->args.i_rmdir.dir->i_op);
+            if(i_op){
+                i_op->rmdir = roflt_rmdir;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
+        }
+        break;
+
+    case REDIRFS_DIR_IOP_SETATTR:
+        if(rargs->args.i_setattr.dentry->d_inode->i_op->setattr != roflt_setattr){
+            FILTER_LOG_DEBUG("\t%s", "setattr");
+
+            i_op = (struct inode_operations*)(rargs->args.i_setattr.dentry->d_inode->i_op);
+            if(i_op){
+                i_op->setattr = roflt_setattr;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
+        }
+        break;
+
+    case REDIRFS_REG_IOP_SETATTR:
+        if(rargs->args.i_setattr.dentry->d_inode->i_op->setattr != roflt_setattr){
+            FILTER_LOG_DEBUG("\t%s", "setattr");
+
+            i_op = (struct inode_operations*)(rargs->args.i_setattr.dentry->d_inode->i_op);
+            if(i_op){
+                i_op->setattr = roflt_setattr;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
+        }
+        break;
+
+    case REDIRFS_DIR_IOP_SYMLINK:
+        if(rargs->args.i_symlink.dir->i_op->symlink != roflt_symlink){
+            FILTER_LOG_DEBUG("\t%s", "symlink");
+
+            i_op = (struct inode_operations*)(rargs->args.i_symlink.dir->i_op);
+            if(i_op){
+                i_op->symlink = roflt_symlink;
+            }
+            else{
+                goto error;
+            }
+            return REDIRFS_STOP;
+        }
+        break;
     }
 
     return REDIRFS_CONTINUE;
