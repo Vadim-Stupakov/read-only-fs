@@ -1,5 +1,4 @@
 KERNEL_VERS = `uname -r`
-#KERNEL_VERS = 3.13.0-24-generic
 KERNEL_BUILDDIR = /lib/modules/$(KERNEL_VERS)/build
 ROOT_PATH=`pwd`
 FILTER_DIR="$(ROOT_PATH)/roflt"
